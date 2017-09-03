@@ -2,37 +2,47 @@
 
 class Afreeca
 {
-	public $start;
-	public $end;
-	public $nTitleNo;
-	public $air;
+	public $start = null;
+	public $end = null;
+	public $nTitleNo = null;
+	public $air = null;
+	public $fail = null;
+	public $bj_id = null;
+	public $thumnail = null;
+	public $nickname = null;
+	public $files = [];
 		// $start 	= 23521328;
 		// $end 	= 23521335;
 
 	function __construct()
 	{
-		$this->setStation();
+
 	}
 
 	public function setStation()
 	{
-
-		$url = "http://afbbs.afreecatv.com:8080/api/video/get_video_info.php?nTitleNo=".
-			$this->start;
+		$url = "http://afbbs.afreecatv.com:8080/api/video/get_video_info.php?nTitleNo=".$this->start;
 		$curl = curl_init($url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-		$air = curl_exec($curl);
-		return $air;
+		$nTitleNo = curl_exec($curl);
+
+	}
+
+	public function fail()
+	{
 		
+		$regex = '#<flag>(.*?)</flag>#';
+		preg_match_all($regex, $this->nTitleNo, $matches);
+        $this->fail = $matches;
+        return $this->fail;
 	}
 
 	public function bj_id()
 	{
-		$air = $this->setStation();
 		// bj_id
 		$regex = '#<\s*?bj_id\b[^>]*>(.*?)<\/bj_id\b[^>]*>#s';
-		preg_match_all($regex, $air, $matches);
-        $data['bj_id'] = $matches[0];
+		preg_match_all($regex, $this->$nTitleNo, $matches);
+        $data['bj_id'] = $matches;
         $data['bj_id'] = str_replace('<bj_id>', '', $data['bj_id']);
         $data['bj_id'] = str_replace('</bj_id>', '', $data['bj_id']);
 
@@ -44,12 +54,13 @@ class Afreeca
 	public function thumnail()
 	{
 		$regex = '#<\s*?titleImage\b[^>]*>(.*?)<\/titleImage\b[^>]*>#s';
-		preg_match_all($regex, $this->setStation(), $matches);
-		$data['thumnail'] = $matches[0];
+		preg_match_all($regex, $this->air, $matches);
+		$data['thumnail'] = $matches;
 		$data['thumnail'] = str_replace('<titleImage>', '', $data['thumnail']);
 		$data['thumnail'] = str_replace('</titleImage>', '', $data['thumnail']);
-
-		return $data['thumnail'];	
+		$this->thumnail = $data['thumnail'];
+		// return $data['thumnail'];	
+		return $this->thumnail;
 	}
 
 
@@ -57,11 +68,11 @@ class Afreeca
 	{
 		// Nickname & title
 		$regex = '(\[CDATA(.|\n)*?>)';
-		preg_match_all($regex, $this->setStation(), $matches);
+		preg_match_all($regex, $this->air, $matches);
 		$data['nickname'] = $matches[0];
 		$data['nickname'] = str_replace('[CDATA[', '', $data['nickname']);
 		$data['nickname'] = str_replace(']]>', '', $data['nickname']);
-
+		$this->nickname = $data['nickname'];
 		return $data['nickname'];
 	}
 
@@ -69,12 +80,12 @@ class Afreeca
 	{
 		// Title
 		$regex = '(\[CDATA(.|\n)*?>)';
-		preg_match_all($regex, $this->setStation(), $matches);
+		preg_match_all($regex, $this->air, $matches);
 		$data['title'] = $matches[0];
 		$data['title'] = str_replace('[CDATA[', '', $data['title']);
 		$data['title'] = str_replace(']]>', '', $data['title']);
-
-		return $data['title'];
+		$this->title = $data['title'];
+		return $this->title;
 	}
 
 	// file	
@@ -82,7 +93,7 @@ class Afreeca
 	{
 		$regex = '#<\s*?file\b[^>]*>(.*?)<\/file\b[^>]*>#s';
 
-		preg_match_all($regex, $this->setStation(), $matches);
+		preg_match_all($regex, $this->air, $matches);
 		$files = $matches[0];
 			foreach ($files as $key => $value)
 			{
