@@ -13,23 +13,32 @@ include('Afreeca.class.php');
 
 if ( isset($_GET['start']) ) 
 {
-	
-	for ($i=$_GET['start']; $i < $_GET['end'] +1; $i++) 
+
+	$afreeca = new Afreeca;
+	if ($afreeca->fail !== 'SUCCEED') {
+		print_r($afreeca->fail);
+	}else
 	{
-		$afreeca = new Afreeca;
-		$afreeca->start = $i;
+		for ($i=$_GET['start']; $i < $_GET['end'] +1; $i++) 
+		{
 
-		echo '<pre>';
-		$afreeca->fail();
-		$afreeca->nickname();
-		$afreeca->getfiles();
-		$afreeca->title();
-		print_r($afreeca);
-		echo '</pre>';
-
-			//$afreeca->nickname().'('.$afreeca->bj_id().')';
-	}	
-
+			$afreeca->start = $i;
+			
+			echo $afreeca->thumnail();
+			echo '<br>';
+			echo $afreeca->nickname();
+			echo '<br>';
+			echo $afreeca->bj_id();
+			echo '<br>';
+			echo $afreeca->title();
+			// print_r($afreeca->getfiles());
+			foreach ($afreeca->getfiles() as $value) {
+				echo $value;
+				echo '<br>';
+			}
+			echo '<br>';
+		}	
+	}
 	
 		// echo '<img src="'. $afreeca->thumnail()[0] . '" style="width:240px"></img><br>';
 		// echo $afreeca->nickname()[0].'('.$afreeca->bj_id()[0].')';
